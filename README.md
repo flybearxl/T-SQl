@@ -1,3 +1,2 @@
 # T-SQl
-T-SQL Programing
-This file is updated!
+T-SQL Programing Study note
