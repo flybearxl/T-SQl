@@ -1,0 +1,46 @@
+  表T，整数字段f，内容如下：3，4，5，7，8，9，14，15，16。
+  如何用较简单的SQL语句查询出中间的断号，也就是6，10，11，12，13？
+  这个问题属于无中生有的类型，我在其他论坛上也贴过，但没有比较好的解决方法。
+
+  经过努力,自己解决了这个问题(此前,绝大多数的方法都是生成一个从最小直到最大值的连续序列过渡表,然后两表关联或利用子查询,查处源表中不存在的值),该方法比较简单也比较巧妙,思路如此:断号的含义也就是不在源表中的号,但断号肯定是源表中的某个号码加上一个数得到的,也就是说,我第一步需要找到源表中的每一个值加1后(取名为f1)不存在源表序列中的值,然后以此为基础,在源表中找大于f1的最小值（取名f2），那么从f1到f2的值即为断号值，到此解决！！
+
+  语句如下（绝对原创，若要引用请指明引处和本人名字）： 
+ 
+WITH    T ( F )
+          AS ( SELECT   3
+               UNION ALL
+               SELECT   4
+               UNION ALL
+               SELECT   5
+               UNION ALL
+               SELECT   7
+               UNION ALL
+               SELECT   8
+               UNION ALL
+               SELECT   9
+               UNION ALL
+               SELECT   14
+               UNION ALL
+               SELECT   15
+               UNION ALL
+               SELECT   16
+             )
+    SELECT  StartNum ,
+            ( SELECT    MIN(f) - 1
+              FROM      t
+              WHERE     f > StartNum--比开始出现断号的最小值小，但是比开始出现断号的值大的值
+            ) AS EndNum
+    FROM    ( SELECT    f + 1 AS StartNum--逐个取不存在的最小断号
+              FROM      t
+              WHERE     f + 1 NOT IN ( SELECT   f
+                                       FROM     t )
+                        AND f < ( SELECT    MAX(f)
+                                  FROM      t
+                                )
+            ) AS cc;
+ 
+  结果如下：
+  StartNum EndNum
+  6              6
+  10            13
+ 
