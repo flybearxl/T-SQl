@@ -1,0 +1,2 @@
+SELECT * FROM sys.sql_modules sm INNER JOIN sys.objects o ON o.object_id = sm.object_id
+WHERE sm.object_id=OBJECT_ID('dbo.uspGetEmployeeManagers')
